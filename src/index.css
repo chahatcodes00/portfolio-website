@@ -48,7 +48,19 @@
     scrollbar-color: var(--color-red-600) var(--color-offwhite);
   }
   body {
-    @apply bg-white text-ink font-body antialiased;
+    @apply bg-white text-ink font-body antialiased cursor-default;
+  }
+  /* Browsers auto-switch to an I-beam text cursor over any selectable
+     text by default. cursor-default on body overrides that everywhere
+     (headings, paragraphs, terminal output, stack list, etc.), then this
+     rule re-asserts a pointer specifically for real interactive elements
+     so links/buttons still look clickable. The terminal's <input> is
+     untouched — a more specific browser default (cursor: text) still
+     applies to actual text inputs, which is the correct behavior there. */
+  a[href],
+  button,
+  [role="button"] {
+    @apply cursor-pointer;
   }
   ::selection {
     @apply bg-red-600 text-white;
@@ -106,7 +118,9 @@
   .reveal {
     opacity: 0;
     transform: translateY(24px);
-    transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+    transition:
+      opacity 0.7s ease-out,
+      transform 0.7s ease-out;
   }
   .reveal.in-view {
     opacity: 1;

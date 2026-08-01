@@ -17,8 +17,10 @@ const COMMANDS = {
   ls: "about.md   projects/   skills.md   contact.md",
   "cat about.md":
     "Cloud & DevOps engineer. Provisions infra as code, containerizes it, ships it on AWS with Terraform.",
-  skills: "AWS · Terraform · Docker · Flask · NGINX · Git · Linux · SSH · CI/CD",
-  "cat skills.md": "AWS · Terraform · Docker · Flask · NGINX · Git · Linux · SSH · CI/CD",
+  skills:
+    "AWS · Terraform · Docker · Flask · NGINX · Git · Linux · SSH · CI/CD",
+  "cat skills.md":
+    "AWS · Terraform · Docker · Flask · NGINX · Git · Linux · SSH · CI/CD",
   projects:
     "ec2-terraform-docker-flask\ncustom-vpc-aws\nportfolio-website\n(run: open <project> to view its repo)",
   "cat contact.md":
@@ -54,6 +56,7 @@ function resolveCommand(raw) {
 // can't be silently overridden by a class-ordering or purge quirk). The
 // body's height is the container height minus the title bar's — a real
 // literal number, not a flex ratio — so content can never resize the box.
+const CONTAINER_WIDTH = 500;
 const CONTAINER_HEIGHT = 420;
 const TITLE_BAR_HEIGHT = 45;
 
@@ -83,7 +86,9 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
     const result = resolveCommand(trimmed);
 
     if (result.clear) {
-      setHistory([{ text: "console cleared — type help to see commands", dim: true }]);
+      setHistory([
+        { text: "console cleared - type help to see commands", dim: true },
+      ]);
       setPast((p) => [...p, trimmed]);
       setPastIndex(null);
       return;
@@ -110,7 +115,8 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
     if (e.key === "ArrowUp") {
       e.preventDefault();
       if (past.length === 0) return;
-      const next = pastIndex === null ? past.length - 1 : Math.max(0, pastIndex - 1);
+      const next =
+        pastIndex === null ? past.length - 1 : Math.max(0, pastIndex - 1);
       setPastIndex(next);
       setInput(past[next]);
       return;
@@ -132,19 +138,31 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
 
   return (
     <div
-      className="w-full max-w-md min-w-0 border border-ink/15 bg-ink text-left shadow-[8px_8px_0_0_#C0392B]"
+      // Fixed 500px box. No `w-full`/`max-w-md` here on purpose: `max-w-md`
+      // is 28rem (448px), which is SMALLER than the 500px we want, so it
+      // was silently clamping the container to 448px regardless of the
+      // inline width. Width is controlled by inline style alone below —
+      // one source of truth, nothing to fight with.
+      className="min-w-0 border border-ink/15 bg-ink text-left shadow-[8px_8px_0_0_#C0392B]"
       style={{
+        width: CONTAINER_WIDTH,
+        maxWidth: CONTAINER_WIDTH,
         height: CONTAINER_HEIGHT,
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+        boxSizing: "border-box",
       }}
       onClick={() => inputRef.current?.focus()}
     >
       {/* Title bar — macOS-style traffic lights (red/yellow/green) */}
       <div
         className="flex items-center gap-2 border-b border-white/10 px-4 py-3"
-        style={{ height: TITLE_BAR_HEIGHT, flexShrink: 0, boxSizing: "border-box" }}
+        style={{
+          height: TITLE_BAR_HEIGHT,
+          flexShrink: 0,
+          boxSizing: "border-box",
+        }}
       >
         <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
@@ -160,16 +178,17 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
           prompt. The faint scanline background keeps the box's true edges
           visible regardless of how much text is in it.
           min-w-0 here (and on the Hero.jsx grid item this sits inside) is
-          the actual fix for the width-stretching bug: CSS Grid/Flexbox
-          items default to min-width:auto, which means a track can never
-          shrink below its widest *unbreakable* piece of content, even if
-          that content's own box has an explicit max-width. A long
-          unbroken string (a divider line, a long repo URL) was forcing
-          the whole terminal — and its grid column — wider, then snapping
-          back once that content scrolled away or got cleared. min-w-0
-          removes that floor; break-words below is the second half of the
-          fix, wrapping any future long token instead of letting it push
-          the box's width at all. */}
+          part of the width-stretching fix: CSS Grid/Flexbox items default
+          to min-width:auto, which means a track can never shrink below its
+          widest *unbreakable* piece of content, even if that content's own
+          box has an explicit max-width. min-w-0 removes that floor.
+          break-words + [overflow-wrap:anywhere] on each output line below
+          is the other half: break-words only breaks at "reasonable" points,
+          so a single long unbroken token (a bare URL, a long repo path,
+          a wide docker/curl output line) could still push past the edge.
+          overflow-wrap:anywhere force-breaks a token if it's the only way
+          to keep it inside the box, so nothing can ever widen the
+          container. */}
       <div
         ref={bodyRef}
         className="scrollbar-none flex min-w-0 flex-col justify-end gap-2 overflow-x-hidden px-4 py-5 font-mono text-[13px] leading-relaxed"
@@ -184,7 +203,9 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
         {history.map((line, i) => (
           <div
             key={i}
-            className={`min-w-0 break-words ${line.dim ? "text-white/60" : "text-white/85"}`}
+            className={`min-w-0 break-words [overflow-wrap:anywhere] ${
+              line.dim ? "text-white/60" : "text-white/85"
+            }`}
           >
             {line.prompt && <span className="text-red-600">$ </span>}
             {line.text}

@@ -51,7 +51,10 @@ export default function Hero() {
 
           <div className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-ink/10 pt-6 font-mono text-xs tracking-[0.15em] text-ink/40">
             {STACK.map((item, i) => (
-              <span key={item} className="flex cursor-default items-center gap-6">
+              <span
+                key={item}
+                className="flex cursor-default items-center gap-6"
+              >
                 {item}
                 {i < STACK.length - 1 && (
                   <span className="text-red-600">·</span>
@@ -61,14 +64,18 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right: interactive terminal — try typing "help" */}
-        <div className="hidden min-w-0 justify-self-end lg:block">
+        {/* Right: interactive terminal — try typing "help"
+            self-start overrides the grid's items-center just for this
+            column, so the terminal's top edge lines up with the top of the
+            left column (the "$ whoami" line) instead of being vertically
+            centered against the taller left column. */}
+        <div className="hidden min-w-0 justify-self-end self-start lg:block">
           <Terminal
             lines={[
-              { text: "chahat@infra — provisioning console", dim: true },
+              { text: "chahat@infra - provisioning console", dim: true },
               { text: "type help to see available commands", dim: true },
               { prompt: true, text: "whoami" },
-              { text: "chahat — aspiring cloud & devops engineer", dim: true },
+              { text: "chahat - aspiring cloud & devops engineer", dim: true },
               { prompt: true, text: "terraform apply" },
               { text: "Apply complete! Resources: 12 added", dim: true },
               { prompt: true, text: "docker ps" },

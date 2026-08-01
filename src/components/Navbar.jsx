@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { MenuIcon, CloseIcon } from "./icons.jsx";
 import { handleSectionLinkClick } from "../utils/scrollToSection.js";
 
@@ -9,49 +9,28 @@ const LINKS = [
   { href: "#contact", label: "Contact" },
 ];
 
-// Below this scroll position the header always stays visible, regardless
-// of direction — avoids the header disappearing right after page load.
-const HIDE_THRESHOLD = 120;
-
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [activeHash, setActiveHash] = useState("#home");
-  const lastScrollY = useRef(0);
 
+  // Only tracks whether we've scrolled past the top (for the
+  // background/blur treatment) — no more hide-on-scroll-down behavior, so
+  // the header (and its underline) behaves identically no matter which
+  // direction the user is scrolling.
   useEffect(() => {
-    const onScroll = () => {
-      const currentY = window.scrollY;
-      setScrolled(currentY > 8);
-
-      // Never hide the header while the mobile menu is open — the toggle
-      // button lives inside it, so hiding it would trap the user.
-      if (open) {
-        lastScrollY.current = currentY;
-        return;
-      }
-
-      const delta = currentY - lastScrollY.current;
-
-      if (currentY < HIDE_THRESHOLD) {
-        setHidden(false);
-      } else if (delta > 4) {
-        setHidden(true);
-      } else if (delta < -4) {
-        setHidden(false);
-      }
-
-      lastScrollY.current = currentY;
-    };
+    const onScroll = () => setScrolled(window.scrollY > 8);
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [open]);
+  }, []);
 
   // Scroll-spy: whichever section sits in the vertical center band of the
-  // viewport becomes "active" and gets the red underline in the nav.
+  // viewport becomes "active" and gets the red underline in the nav. This
+  // is driven by IntersectionObserver, not scroll direction, so it always
+  // updated correctly in both directions — it just used to be hidden from
+  // view whenever the header itself was hidden while scrolling down.
   useEffect(() => {
     const sections = LINKS.map((link) =>
       document.getElementById(link.href.slice(1)),
@@ -76,9 +55,7 @@ export default function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 transition-[transform,background-color] duration-300 ${
-        hidden ? "-translate-y-full" : "translate-y-0"
-      } ${
+      className={`fixed top-0 inset-x-0 z-50 transition-colors duration-300 ${
         scrolled
           ? "bg-white/90 backdrop-blur border-b border-ink/10"
           : "bg-transparent"
@@ -133,11 +110,7 @@ export default function Navbar() {
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="mobile-menu"
-          onClick={() => setOpen((v) => {
-            const next = !v;
-            if (next) setHidden(false);
-            return next;
-          })}
+          onClick={() => setOpen((v) => !v)}
         >
           {open ? (
             <CloseIcon className="h-6 w-6" />
