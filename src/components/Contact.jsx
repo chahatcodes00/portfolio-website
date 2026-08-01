@@ -1,7 +1,6 @@
 import { GithubIcon, LinkedinIcon, MailIcon, ArrowUpRight } from "./icons.jsx";
 import useScrollReveal from "../hooks/useScrollReveal.js";
 
-// TODO: replace with your real inbox before you deploy this.
 const EMAIL = "chahat.bs01@gmail.com";
 
 const SOCIALS = [

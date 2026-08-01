@@ -23,7 +23,7 @@ export default function ProjectCard({ project }) {
         {stack.map((tech) => (
           <span
             key={tech}
-            className="border border-ink/10 px-2.5 py-1 font-mono text-[11px] text-ink/50"
+            className="cursor-default border border-ink/10 px-2.5 py-1 font-mono text-[11px] text-ink/50"
           >
             {tech}
           </span>

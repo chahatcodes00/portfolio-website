@@ -74,7 +74,6 @@ npm run lint
 │   ├── main.jsx          # App entry point
 │   └── index.css         # Global styles / Tailwind entry
 ├── index.html
-├── tailwind.config.js
 ├── vite.config.js
 └── package.json
 ```

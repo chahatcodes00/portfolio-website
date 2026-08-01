@@ -55,7 +55,7 @@ export default function About() {
                 {group.items.map((item) => (
                   <span
                     key={item}
-                    className="border border-ink/15 bg-white px-3 py-1.5 font-mono text-xs text-ink/80 transition-colors hover:border-red-600 hover:text-red-600"
+                    className="cursor-default border border-ink/15 bg-white px-3 py-1.5 font-mono text-xs text-ink/80 transition-colors hover:border-red-600 hover:text-red-600"
                   >
                     {item}
                   </span>

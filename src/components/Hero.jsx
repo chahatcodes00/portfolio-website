@@ -1,4 +1,5 @@
 import Terminal from "./Terminal.jsx";
+import { handleSectionLinkClick } from "../utils/scrollToSection.js";
 
 const STACK = ["AWS", "TERRAFORM", "DOCKER", "CI/CD", "LINUX"];
 
@@ -34,12 +35,14 @@ export default function Hero() {
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <a
               href="#projects"
+              onClick={(e) => handleSectionLinkClick(e, "projects")}
               className="bg-ink px-7 py-3.5 font-mono text-xs uppercase tracking-[0.15em] text-white transition-colors hover:bg-red-600"
             >
               View projects
             </a>
             <a
               href="#contact"
+              onClick={(e) => handleSectionLinkClick(e, "contact")}
               className="border border-ink px-7 py-3.5 font-mono text-xs uppercase tracking-[0.15em] text-ink transition-colors hover:border-red-600 hover:text-red-600"
             >
               Get in touch
@@ -48,7 +51,7 @@ export default function Hero() {
 
           <div className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-ink/10 pt-6 font-mono text-xs tracking-[0.15em] text-ink/40">
             {STACK.map((item, i) => (
-              <span key={item} className="flex items-center gap-6">
+              <span key={item} className="flex cursor-default items-center gap-6">
                 {item}
                 {i < STACK.length - 1 && (
                   <span className="text-red-600">·</span>
@@ -58,10 +61,14 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right: terminal mockup */}
-        <div className="hidden justify-self-end lg:block">
+        {/* Right: interactive terminal — try typing "help" */}
+        <div className="hidden min-w-0 justify-self-end lg:block">
           <Terminal
             lines={[
+              { text: "chahat@infra — provisioning console", dim: true },
+              { text: "type help to see available commands", dim: true },
+              { prompt: true, text: "whoami" },
+              { text: "chahat — aspiring cloud & devops engineer", dim: true },
               { prompt: true, text: "terraform apply" },
               { text: "Apply complete! Resources: 12 added", dim: true },
               { prompt: true, text: "docker ps" },

@@ -43,6 +43,9 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-red-600) var(--color-offwhite);
   }
   body {
     @apply bg-white text-ink font-body antialiased;
@@ -53,9 +56,36 @@
   section {
     scroll-margin-top: 88px;
   }
+
+  /* Chromium / WebKit scrollbar, styled to match the ink/red palette
+     instead of the browser-default plain grey bar. */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-offwhite);
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-red-600);
+    border: 2px solid var(--color-offwhite);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-red-700);
+  }
 }
 
 @layer utilities {
+  /* Hides the scrollbar visually while keeping the element scrollable —
+     used on the terminal widget, which handles its own compact layout and
+     doesn't need a visible scroll affordance inside a small dark box. */
+  .scrollbar-none {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* old Edge */
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none; /* Chrome / Safari / new Edge */
+  }
+
   .section-padding {
     @apply px-6 md:px-12 lg:px-24 py-24 md:py-32;
   }

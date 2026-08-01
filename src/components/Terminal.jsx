@@ -1,24 +1,211 @@
+import { useEffect, useRef, useState } from "react";
+
+const SITE_URL = "https://chahatrsrathour.com.np/";
+
+const PROJECT_LINKS = {
+  "ec2-terraform-docker-flask":
+    "github.com/chahatcodes00/EC2-using-Terraform-and-Docker-Flask-Web-App-Launch",
+  "custom-vpc-aws":
+    "github.com/chahatcodes00/Terraform-AWS-Deployment-with-Custom-VPC-EC2-S3",
+  "portfolio-website": "github.com/chahatcodes00/portfolio-website",
+};
+
+const COMMANDS = {
+  help: "Commands: help, whoami, pwd, ls, cat about.md, skills, projects, cat contact.md, open <project>, clear",
+  whoami: "chahat — aspiring cloud & devops engineer",
+  pwd: SITE_URL,
+  ls: "about.md   projects/   skills.md   contact.md",
+  "cat about.md":
+    "Cloud & DevOps engineer. Provisions infra as code, containerizes it, ships it on AWS with Terraform.",
+  skills: "AWS · Terraform · Docker · Flask · NGINX · Git · Linux · SSH · CI/CD",
+  "cat skills.md": "AWS · Terraform · Docker · Flask · NGINX · Git · Linux · SSH · CI/CD",
+  projects:
+    "ec2-terraform-docker-flask\ncustom-vpc-aws\nportfolio-website\n(run: open <project> to view its repo)",
+  "cat contact.md":
+    "email: chahat.bs01@gmail.com\ngithub: github.com/chahatcodes00\nlinkedin: /in/chahat-r-s-rathour-414906338",
+  "terraform apply": "Apply complete! Resources: 12 added",
+  "docker ps": "flask-app   Up 3h   0.0.0.0:5000->5000/tcp",
+  "curl -i chahatrsrathour.com.np": "HTTP/1.1 200 OK",
+  "sudo rm -rf /": "Nice try. Permission denied.",
+};
+
+// Resolves one typed command to plain text output, or a { clear: true }
+// signal. Pure function, easy to extend later.
+function resolveCommand(raw) {
+  const trimmed = raw.trim();
+  const lower = trimmed.toLowerCase();
+
+  if (lower === "clear") return { clear: true };
+
+  if (lower.startsWith("open ")) {
+    const target = lower.slice(5).trim();
+    const url = PROJECT_LINKS[target];
+    return { text: url ? url : `open: no such project "${target}"` };
+  }
+
+  if (Object.prototype.hasOwnProperty.call(COMMANDS, lower)) {
+    return { text: COMMANDS[lower] };
+  }
+
+  return { text: `bash: ${trimmed}: command not found` };
+}
+
+// Fixed pixel dimensions, applied as inline styles (highest CSS specificity,
+// can't be silently overridden by a class-ordering or purge quirk). The
+// body's height is the container height minus the title bar's — a real
+// literal number, not a flex ratio — so content can never resize the box.
+const CONTAINER_HEIGHT = 420;
+const TITLE_BAR_HEIGHT = 45;
+
 export default function Terminal({ title = "chahat@infra", lines = [] }) {
+  const [history, setHistory] = useState(
+    lines.map((l) => ({ prompt: !!l.prompt, text: l.text, dim: !!l.dim })),
+  );
+  const [input, setInput] = useState("");
+  const [past, setPast] = useState([]);
+  const [pastIndex, setPastIndex] = useState(null);
+  const bodyRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (bodyRef.current) {
+      bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
+    }
+  }, [history]);
+
+  function runCommand(raw) {
+    const trimmed = raw.trim();
+    if (!trimmed) {
+      setHistory((h) => [...h, { prompt: true, text: "" }]);
+      return;
+    }
+
+    const result = resolveCommand(trimmed);
+
+    if (result.clear) {
+      setHistory([{ text: "console cleared — type help to see commands", dim: true }]);
+      setPast((p) => [...p, trimmed]);
+      setPastIndex(null);
+      return;
+    }
+
+    setHistory((h) => [
+      ...h,
+      { prompt: true, text: trimmed },
+      ...String(result.text)
+        .split("\n")
+        .map((text) => ({ text, dim: true })),
+    ]);
+    setPast((p) => [...p, trimmed]);
+    setPastIndex(null);
+  }
+
+  function onKeyDown(e) {
+    if (e.key === "Enter") {
+      runCommand(input);
+      setInput("");
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (past.length === 0) return;
+      const next = pastIndex === null ? past.length - 1 : Math.max(0, pastIndex - 1);
+      setPastIndex(next);
+      setInput(past[next]);
+      return;
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (pastIndex === null) return;
+      const next = pastIndex + 1;
+      if (next >= past.length) {
+        setPastIndex(null);
+        setInput("");
+      } else {
+        setPastIndex(next);
+        setInput(past[next]);
+      }
+    }
+  }
+
   return (
-    <div className="w-full max-w-md border border-ink/15 bg-ink text-left shadow-[8px_8px_0_0_#C0392B]">
-      {/* Title bar */}
-      <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/20" />
-        <span className="ml-2 font-mono text-[11px] uppercase tracking-[0.15em] text-white/40">
+    <div
+      className="w-full max-w-md min-w-0 border border-ink/15 bg-ink text-left shadow-[8px_8px_0_0_#C0392B]"
+      style={{
+        height: CONTAINER_HEIGHT,
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+      onClick={() => inputRef.current?.focus()}
+    >
+      {/* Title bar — macOS-style traffic lights (red/yellow/green) */}
+      <div
+        className="flex items-center gap-2 border-b border-white/10 px-4 py-3"
+        style={{ height: TITLE_BAR_HEIGHT, flexShrink: 0, boxSizing: "border-box" }}
+      >
+        <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
+        <span className="ml-2 font-mono text-[11px] uppercase tracking-[0.15em] text-white/55">
           {title}
         </span>
       </div>
 
-      {/* Body */}
-      <div className="space-y-2 px-4 py-5 font-mono text-[13px] leading-relaxed">
-        {lines.map((line, i) => (
-          <div key={i} className={line.dim ? "text-white/40" : "text-white/85"}>
+      {/* Body — explicit pixel height (container minus title bar), scrolls
+          internally, scrollbar hidden via .scrollbar-none.
+          justify-end anchors content to the bottom, like a real terminal
+          prompt. The faint scanline background keeps the box's true edges
+          visible regardless of how much text is in it.
+          min-w-0 here (and on the Hero.jsx grid item this sits inside) is
+          the actual fix for the width-stretching bug: CSS Grid/Flexbox
+          items default to min-width:auto, which means a track can never
+          shrink below its widest *unbreakable* piece of content, even if
+          that content's own box has an explicit max-width. A long
+          unbroken string (a divider line, a long repo URL) was forcing
+          the whole terminal — and its grid column — wider, then snapping
+          back once that content scrolled away or got cleared. min-w-0
+          removes that floor; break-words below is the second half of the
+          fix, wrapping any future long token instead of letting it push
+          the box's width at all. */}
+      <div
+        ref={bodyRef}
+        className="scrollbar-none flex min-w-0 flex-col justify-end gap-2 overflow-x-hidden px-4 py-5 font-mono text-[13px] leading-relaxed"
+        style={{
+          height: CONTAINER_HEIGHT - TITLE_BAR_HEIGHT,
+          overflowY: "auto",
+          boxSizing: "border-box",
+          backgroundImage:
+            "repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 4px)",
+        }}
+      >
+        {history.map((line, i) => (
+          <div
+            key={i}
+            className={`min-w-0 break-words ${line.dim ? "text-white/60" : "text-white/85"}`}
+          >
             {line.prompt && <span className="text-red-600">$ </span>}
             {line.text}
           </div>
         ))}
+
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="text-red-600">$</span>
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={onKeyDown}
+            autoComplete="off"
+            autoCapitalize="off"
+            spellCheck="false"
+            aria-label="Interactive terminal. Type help for a list of commands."
+            className="min-w-0 flex-1 bg-transparent font-mono text-[13px] text-white/85 caret-red-600 outline-none placeholder:text-white/40"
+            placeholder="type help"
+          />
+        </div>
       </div>
     </div>
   );
