@@ -143,7 +143,7 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
       // was silently clamping the container to 448px regardless of the
       // inline width. Width is controlled by inline style alone below —
       // one source of truth, nothing to fight with.
-      className="min-w-0 border border-ink/15 bg-ink text-left shadow-[8px_8px_0_0_#C0392B]"
+      className="min-w-0 border border-ink bg-white text-left shadow-[8px_8px_0_0_#C0392B] dark:border-white/35 dark:bg-ink"
       style={{
         width: CONTAINER_WIDTH,
         maxWidth: CONTAINER_WIDTH,
@@ -157,7 +157,7 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
     >
       {/* Title bar — macOS-style traffic lights (red/yellow/green) */}
       <div
-        className="flex items-center gap-2 border-b border-white/10 px-4 py-3"
+        className="flex items-center gap-2 border-b border-ink/10 px-4 py-3 dark:border-white/10"
         style={{
           height: TITLE_BAR_HEIGHT,
           flexShrink: 0,
@@ -167,7 +167,7 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
         <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
-        <span className="ml-2 font-mono text-[11px] uppercase tracking-[0.15em] text-white/55">
+        <span className="ml-2 font-mono text-[11px] uppercase tracking-[0.15em] text-ink/55 dark:text-white/55">
           {title}
         </span>
       </div>
@@ -191,20 +191,20 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
           container. */}
       <div
         ref={bodyRef}
-        className="scrollbar-none flex min-w-0 flex-col justify-end gap-2 overflow-x-hidden px-4 py-5 font-mono text-[13px] leading-relaxed"
+        className="terminal-scanlines scrollbar-none flex min-w-0 flex-col justify-end gap-2 overflow-x-hidden px-4 py-5 font-mono text-[13px] leading-relaxed"
         style={{
           height: CONTAINER_HEIGHT - TITLE_BAR_HEIGHT,
           overflowY: "auto",
           boxSizing: "border-box",
-          backgroundImage:
-            "repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 4px)",
         }}
       >
         {history.map((line, i) => (
           <div
             key={i}
             className={`min-w-0 break-words [overflow-wrap:anywhere] ${
-              line.dim ? "text-white/60" : "text-white/85"
+              line.dim
+                ? "text-ink/60 dark:text-white/60"
+                : "text-ink/85 dark:text-white/85"
             }`}
           >
             {line.prompt && <span className="text-red-600">$ </span>}
@@ -223,7 +223,7 @@ export default function Terminal({ title = "chahat@infra", lines = [] }) {
             autoCapitalize="off"
             spellCheck="false"
             aria-label="Interactive terminal. Type help for a list of commands."
-            className="min-w-0 flex-1 bg-transparent font-mono text-[13px] text-white/85 caret-red-600 outline-none placeholder:text-white/40"
+            className="min-w-0 flex-1 bg-transparent font-mono text-[13px] text-ink/85 caret-red-600 outline-none placeholder:text-ink/40 dark:text-white/85 dark:placeholder:text-white/40"
             placeholder="type help"
           />
         </div>

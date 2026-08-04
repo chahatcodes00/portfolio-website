@@ -1,14 +1,5 @@
 @import "tailwindcss";
 
-/* Manual dark mode: Tailwind v4 defaults `dark:` to the OS-level
-   prefers-color-scheme media query. This repoints it to a `.dark` class on
-   <html> instead, so the theme is a user choice (toggled in Navbar, via
-   ThemeToggle) rather than something the OS decides for us. The
-   `:where(.dark, .dark *)` form matches the element itself if IT has the
-   class, or any descendant of an element that has it — the standard v4
-   recipe for class-based dark mode. */
-@custom-variant dark (&:where(.dark, .dark *));
-
 /* Design tokens — Tailwind v4 reads these and auto-generates the matching
    utilities (bg-ink, text-red-600, font-display, animate-blink, etc.) */
 @theme {
@@ -57,23 +48,7 @@
     scrollbar-color: var(--color-red-600) var(--color-offwhite);
   }
   body {
-    @apply bg-white text-ink font-body antialiased cursor-default dark:bg-ink dark:text-white;
-  }
-  /* Color-only crossfade on theme toggle. Scoped to color-adjacent
-     properties (not `all`/transform/opacity) so it never fights the
-     .reveal scroll-in animation or any hover transform elsewhere — those
-     set their own `transition` on the specific element and, being a class
-     selector, simply take priority over this element-selector fallback. */
-  *,
-  *::before,
-  *::after {
-    transition:
-      background-color 0.25s ease,
-      border-color 0.25s ease,
-      color 0.25s ease,
-      fill 0.25s ease,
-      stroke 0.25s ease,
-      box-shadow 0.25s ease;
+    @apply bg-white text-ink font-body antialiased cursor-default;
   }
   /* Browsers auto-switch to an I-beam text cursor over any selectable
      text by default. cursor-default on body overrides that everywhere
@@ -95,11 +70,7 @@
   }
 
   /* Chromium / WebKit scrollbar, styled to match the ink/red palette
-     instead of the browser-default plain grey bar. The thumb's border is
-     the same color as the track on purpose (it's what makes the thumb
-     look inset rather than outlined) — so it has to flip with theme too,
-     or the border would show up as a mismatched light ring on a dark
-     track. */
+     instead of the browser-default plain grey bar. */
   ::-webkit-scrollbar {
     width: 10px;
   }
@@ -112,15 +83,6 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-red-700);
-  }
-  .dark {
-    scrollbar-color: var(--color-red-600) var(--color-ink); /* Firefox */
-  }
-  .dark ::-webkit-scrollbar-track {
-    background: var(--color-ink);
-  }
-  .dark ::-webkit-scrollbar-thumb {
-    border-color: var(--color-ink);
   }
 }
 
@@ -152,48 +114,13 @@
     text-wrap: balance;
   }
 
-  /* Terminal body's faint scanline texture. Needs a theme-aware tint:
-     white lines only read against the dark-mode terminal (bg-ink); on the
-     light-mode terminal (bg-white) they'd be invisible, so light mode gets
-     the same texture in ink instead. Lives here instead of as an inline
-     style in Terminal.jsx so it can respond to the `.dark` class. */
-  .terminal-scanlines {
-    background-image: repeating-linear-gradient(
-      0deg,
-      rgba(13, 13, 13, 0.035) 0px,
-      rgba(13, 13, 13, 0.035) 1px,
-      transparent 1px,
-      transparent 4px
-    );
-  }
-  .dark .terminal-scanlines {
-    background-image: repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.035) 0px,
-      rgba(255, 255, 255, 0.035) 1px,
-      transparent 1px,
-      transparent 4px
-    );
-  }
-
-  /* Brief flash applied to a project's stack tag when jumped to from a
-     matching skill chip in About, so it's obvious which tag was the target. */
-  .tag-jump-highlight {
-    border-color: var(--color-red-600) !important;
-    color: var(--color-red-600) !important;
-    background-color: var(--color-red-50);
-  }
-  .dark .tag-jump-highlight {
-    background-color: rgba(192, 57, 43, 0.18);
-  }
-
   /* Scroll-reveal: hidden until the .in-view class is toggled by useScrollReveal */
   .reveal {
     opacity: 0;
-    transform: translateY(48px);
+    transform: translateY(24px);
     transition:
-      opacity 0.9s ease-out,
-      transform 0.9s ease-out;
+      opacity 0.7s ease-out,
+      transform 0.7s ease-out;
   }
   .reveal.in-view {
     opacity: 1;

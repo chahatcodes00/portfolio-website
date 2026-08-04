@@ -5,6 +5,21 @@
     <link rel="icon" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Chahat R. S. Rathour" />
+
+    <!-- Applies the saved theme before first paint so there's no flash of
+         the wrong theme on load. Kept tiny and inline (not a module) so it
+         runs synchronously, before the stylesheet or React even mount. -->
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("theme") === "dark") {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {
+          /* localStorage unavailable (privacy mode, etc.) — default to light */
+        }
+      })();
+    </script>
     <title>Chahat | Personal Portfolio</title>
 
     <!-- Open Graph / social preview -->

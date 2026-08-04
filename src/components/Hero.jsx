@@ -7,7 +7,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="bg-blueprint relative flex min-h-screen items-center overflow-hidden pt-20"
+      className="relative flex min-h-screen items-center overflow-hidden pt-20"
     >
       <div className="section-padding grid w-full grid-cols-1 items-center gap-16 lg:grid-cols-[1.2fr_1fr]">
         {/* Left: statement */}
@@ -20,13 +20,13 @@ export default function Hero() {
             />
           </div>
 
-          <h1 className="font-display text-balance text-6xl font-semibold leading-[0.95] tracking-tight text-ink sm:text-7xl lg:text-8xl">
+          <h1 className="font-display text-balance text-6xl font-semibold leading-[0.95] tracking-tight text-ink sm:text-7xl lg:text-8xl dark:text-white">
             CHAHAT
             <br />
             R.S. RATHOUR
           </h1>
 
-          <p className="mt-8 max-w-xl text-balance text-lg text-ink/60 sm:text-xl">
+          <p className="mt-8 max-w-xl text-balance text-lg text-ink/60 sm:text-xl dark:text-white/60">
             Aspiring Cloud &amp; DevOps engineer. I provision infrastructure,
             containerize it, and ship it on AWS, with Terraform, without the
             guesswork.
@@ -36,20 +36,20 @@ export default function Hero() {
             <a
               href="#projects"
               onClick={(e) => handleSectionLinkClick(e, "projects")}
-              className="bg-ink px-7 py-3.5 font-mono text-xs uppercase tracking-[0.15em] text-white transition-colors hover:bg-red-600"
+              className="bg-ink px-7 py-3.5 font-mono text-xs uppercase tracking-[0.15em] text-white transition-colors hover:bg-red-600 dark:bg-white dark:text-ink dark:hover:bg-red-600 dark:hover:text-white"
             >
               View projects
             </a>
             <a
               href="#contact"
               onClick={(e) => handleSectionLinkClick(e, "contact")}
-              className="border border-ink px-7 py-3.5 font-mono text-xs uppercase tracking-[0.15em] text-ink transition-colors hover:border-red-600 hover:text-red-600"
+              className="border border-ink px-7 py-3.5 font-mono text-xs uppercase tracking-[0.15em] text-ink transition-colors hover:border-red-600 hover:text-red-600 dark:border-white dark:text-white"
             >
               Get in touch
             </a>
           </div>
 
-          <div className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-ink/10 pt-6 font-mono text-xs tracking-[0.15em] text-ink/40">
+          <div className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-ink/10 pt-6 font-mono text-xs tracking-[0.15em] text-ink/40 dark:border-white/10 dark:text-white/40">
             {STACK.map((item, i) => (
               <span
                 key={item}
